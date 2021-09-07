@@ -1,0 +1,9 @@
+POST http://localhost:8000/clip HTTP/1.1
+Content-Type: application/json
+
+{
+	"url": "https://www.youtube.com/watch?v=UDAVj_vlAr8",
+	"clips": [
+		{"start": "00:01", "end":"01:03", "player":"Mate", "event":"nem"}
+	]
+}

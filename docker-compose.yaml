@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: clipper-backend:latest
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - CLIP_DIR=/clipper/clips
+      - SRC_DIR=/clipper/sources
+    volumes:
+      - ${HOME}/clipper/source_videos:/clipper/sources
+      - ${HOME}/clipper/clips:/clipper/clips
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: clipper-frontend:latest
+    ports:
+      - "8080:80"
