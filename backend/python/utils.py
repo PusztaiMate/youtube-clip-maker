@@ -1,3 +1,4 @@
+import logging
 import os
 
 
@@ -20,7 +21,11 @@ def get_video_title_from_filename_and_url(file_path: str, url: str) -> str:
 
 def get_video_id_from_url(url: str) -> str:
     url = url.split("&")[0]
-    return url.split("?v=")[1]
+    try:
+        return url.split("?v=")[1]
+    except IndexError:
+        logging.error(f"?v= not found in {url}, using {url[-10:]}")
+        return f"temp_{url[-10:]}"
 
 
 def strip_list_from_video_url(url: str) -> str:

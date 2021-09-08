@@ -3,7 +3,7 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./backend
+      context: ./backend/python
       dockerfile: Dockerfile
     image: clipper-backend:latest
     expose:

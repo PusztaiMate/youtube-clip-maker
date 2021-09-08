@@ -57,15 +57,20 @@ def clip(ytv: YoutubeClip):
 
     for clip in ytv.clips:
         if not validate_clip_fields(clip):
+            logging.error(f"clip {clip} is not valid, skipping")
             continue
 
         player_clip_dir = os.path.join(CLIP_DIR, clip.player).replace(" ", "_")
         os.makedirs(player_clip_dir, exist_ok=True)
 
-        ts = FfmpegTimeStamp.from_start_end(clip.start, clip.end)
+        try:
+            ts = FfmpegTimeStamp.from_start_end(clip.start, clip.end)
+        except ValueError as e:
+            logging.error(f"error, when creating clip '{clip}': '{str(e)}'")
+            continue
         out_name = f"{video_title}_{clip.start}_{clip.end}.mp4"
         out_path = os.path.join(player_clip_dir, out_name)
         c = FfmpegCutCmd(video_file, out_path, ts)
         c.do()
 
-    return {"message": "success"}
+    return {"message": "success"}, 200

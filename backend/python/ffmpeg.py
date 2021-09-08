@@ -28,14 +28,15 @@ class FfmpegTimeStamp:
         return cls(str(ts1), str(ts2 - ts1))
 
     @staticmethod
-    def _validate_format(s):
-        sep = ":" if ":" in s else "."
+    def _validate_format(s: str):
+        sep = ":"
+        s = s.replace(".", ":")
         mins, secs = s.split(sep)
         try:
             int(mins)
-            int(s)
+            int(secs)
         except ValueError:
-            ValueError(f"'s' is not in expected format 'mm:ss' or 'mm.ss'")
+            ValueError(f"'{s}' is not in expected format 'mm:ss' or 'mm.ss'")
 
     def _get_mins_and_secs(s: str) -> Tuple[int, int]:
         sep = ":" if ":" in s else "."
@@ -57,7 +58,7 @@ class FfmpegCutCmd:
 
     def do(self):
         self.command += self._get_timestap_command(self.ts.ts, self.inp, self.ts.length)
-        self.command += " -c copy"
+        # self.command += " -c copy"
         self.command += f" -y {self.out}"
 
         logging.info(f"executing command {self.command}")

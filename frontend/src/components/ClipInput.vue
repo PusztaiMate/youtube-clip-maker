@@ -43,14 +43,14 @@
           />
         </td>
         <td>
-          <select v-model="selectedName" class="select">
+          <select v-model="c.player" class="select">
             <option v-for="name in names" :key="name" :value="name">
               {{ name }}
             </option>
           </select>
         </td>
         <td>
-          <select v-model="selectedEvent" class="select">
+          <select v-model="c.event" class="select">
             <option v-for="event in events" :key="event" :value="event">
               {{ event }}
             </option>
@@ -97,12 +97,12 @@ interface Player {
   lname: string;
 }
 
-interface Clip {
-  start: string;
-  end: string;
-  player: string;
-  event: string;
-}
+// interface Clip {
+//   start: string;
+//   end: string;
+//   player: string;
+//   event: string;
+// }
 
 export default defineComponent({
   name: "ClipInput",
