@@ -180,3 +180,4 @@ yarn-error.log
 *.mp4
 *.pyc
 archive
+backend/go/archive.txt
