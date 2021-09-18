@@ -14,86 +14,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ClipServerClient is the client API for ClipServer service.
+// ClipsClient is the client API for Clips service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ClipServerClient interface {
-	NewClip(ctx context.Context, in *ClipInfo, opts ...grpc.CallOption) (*Response, error)
+type ClipsClient interface {
+	NewClip(ctx context.Context, in *ClipsRequest, opts ...grpc.CallOption) (*ClipsResponse, error)
 }
 
-type clipServerClient struct {
+type clipsClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewClipServerClient(cc grpc.ClientConnInterface) ClipServerClient {
-	return &clipServerClient{cc}
+func NewClipsClient(cc grpc.ClientConnInterface) ClipsClient {
+	return &clipsClient{cc}
 }
 
-func (c *clipServerClient) NewClip(ctx context.Context, in *ClipInfo, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/clips.ClipServer/NewClip", in, out, opts...)
+func (c *clipsClient) NewClip(ctx context.Context, in *ClipsRequest, opts ...grpc.CallOption) (*ClipsResponse, error) {
+	out := new(ClipsResponse)
+	err := c.cc.Invoke(ctx, "/clips.Clips/NewClip", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ClipServerServer is the server API for ClipServer service.
-// All implementations must embed UnimplementedClipServerServer
+// ClipsServer is the server API for Clips service.
+// All implementations must embed UnimplementedClipsServer
 // for forward compatibility
-type ClipServerServer interface {
-	NewClip(context.Context, *ClipInfo) (*Response, error)
-	mustEmbedUnimplementedClipServerServer()
+type ClipsServer interface {
+	NewClip(context.Context, *ClipsRequest) (*ClipsResponse, error)
+	mustEmbedUnimplementedClipsServer()
 }
 
-// UnimplementedClipServerServer must be embedded to have forward compatible implementations.
-type UnimplementedClipServerServer struct {
+// UnimplementedClipsServer must be embedded to have forward compatible implementations.
+type UnimplementedClipsServer struct {
 }
 
-func (UnimplementedClipServerServer) NewClip(context.Context, *ClipInfo) (*Response, error) {
+func (UnimplementedClipsServer) NewClip(context.Context, *ClipsRequest) (*ClipsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewClip not implemented")
 }
-func (UnimplementedClipServerServer) mustEmbedUnimplementedClipServerServer() {}
+func (UnimplementedClipsServer) mustEmbedUnimplementedClipsServer() {}
 
-// UnsafeClipServerServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ClipServerServer will
+// UnsafeClipsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ClipsServer will
 // result in compilation errors.
-type UnsafeClipServerServer interface {
-	mustEmbedUnimplementedClipServerServer()
+type UnsafeClipsServer interface {
+	mustEmbedUnimplementedClipsServer()
 }
 
-func RegisterClipServerServer(s grpc.ServiceRegistrar, srv ClipServerServer) {
-	s.RegisterService(&ClipServer_ServiceDesc, srv)
+func RegisterClipsServer(s grpc.ServiceRegistrar, srv ClipsServer) {
+	s.RegisterService(&Clips_ServiceDesc, srv)
 }
 
-func _ClipServer_NewClip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClipInfo)
+func _Clips_NewClip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClipsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ClipServerServer).NewClip(ctx, in)
+		return srv.(ClipsServer).NewClip(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/clips.ClipServer/NewClip",
+		FullMethod: "/clips.Clips/NewClip",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClipServerServer).NewClip(ctx, req.(*ClipInfo))
+		return srv.(ClipsServer).NewClip(ctx, req.(*ClipsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ClipServer_ServiceDesc is the grpc.ServiceDesc for ClipServer service.
+// Clips_ServiceDesc is the grpc.ServiceDesc for Clips service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ClipServer_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "clips.ClipServer",
-	HandlerType: (*ClipServerServer)(nil),
+var Clips_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "clips.Clips",
+	HandlerType: (*ClipsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "NewClip",
-			Handler:    _ClipServer_NewClip_Handler,
+			Handler:    _Clips_NewClip_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -19,14 +19,18 @@ const (
 )
 
 type server struct {
-	clips.UnimplementedClipServerServer
+	clips.UnimplementedClipsServer
 
 	logger *log.Logger
 }
 
-func (s *server) NewClip(ctx context.Context, ci *clips.ClipInfo) (*clips.Response, error) {
-	s.logger.Printf("received %#v", ci)
-	return &clips.Response{Content: "Hello"}, nil
+func (s *server) NewClip(c context.Context, cr *clips.ClipsRequest) (*clips.ClipsResponse, error) {
+	s.logger.Printf("url in the incoming request: %s", cr.Url)
+	s.logger.Printf("received %d clips", len(cr.Clips))
+	for _, clip := range cr.Clips {
+		s.logger.Printf("received clip: %v", clip)
+	}
+	return &clips.ClipsResponse{Message: "success"}, nil
 }
 
 func main() {
@@ -42,7 +46,7 @@ func main() {
 		logger.Fatalf("can not listen on address %s (maybe port is taken?)", lis.Addr())
 	}
 	s := grpc.NewServer()
-	clips.RegisterClipServerServer(s, &server{logger: logger})
+	clips.RegisterClipsServer(s, &server{logger: logger})
 	logger.Printf("starting server...")
 	if err := s.Serve(lis); err != nil {
 		logger.Fatalf("server stopped: %v", err)

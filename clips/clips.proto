@@ -5,14 +5,21 @@ option go_package = "github.com/PusztaiMate/clip-maker/clips";
 package clips;
 
 
-service ClipServer {
-	rpc NewClip(ClipInfo) returns (Response) {}
+service Clips {
+	rpc NewClip(ClipsRequest) returns (ClipsResponse) {}
 }
 
-message ClipInfo {
-	string player=1;
+message ClipsRequest {
+	string url = 1;
+	repeated Clip clips = 2;
 }
 
-message Response {
-	string content=1;
+message Clip {
+	string player = 1;
+	string start_time = 2;
+	string end_time = 3;
+}
+
+message ClipsResponse {
+	string message = 1;
 }
