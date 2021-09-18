@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/PusztaiMate/clip-maker/clips";
+
+package clips;
+
+
+service ClipServer {
+	rpc NewClip(ClipInfo) returns (Response) {}
+}
+
+message ClipInfo {
+	string player=1;
+}
+
+message Response {
+	string content=1;
+}
