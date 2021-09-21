@@ -34,9 +34,9 @@ func (f FfmpegCommand) Do() {
 		go func(c *exec.Cmd) {
 			defer wgExec.Done()
 			f.logger.Printf("executing '%s'", strings.Join(c.Args, " "))
-			err := c.Run()
+			out, err := c.CombinedOutput()
 			if err != nil {
-				errChan <- fmt.Errorf("error while issuing command '%s': '%s'", strings.Join(c.Args, " "), err)
+				errChan <- fmt.Errorf("error while issuing command '%s': '%s' (%s)", c, err, out)
 			}
 		}(cmd)
 	}
@@ -61,7 +61,7 @@ func (f *FfmpegCommand) createOutputName(first, second string) string {
 }
 
 func createSingleCmd(input, output, startTime, endTime string) *exec.Cmd {
-	return exec.Command("ffmpeg", "-ss", startTime, "-i", wrapWithSingleQuote(input), "-to", endTime, wrapWithSingleQuote(output))
+	return exec.Command("ffmpeg", "-ss", startTime, "-i", input, "-to", endTime, "-y", replaceSpaceWithUnderscore((output)))
 }
 
 func (f *FfmpegCommand) SetOutPrefix(prefix string) {
@@ -78,6 +78,6 @@ func (f *FfmpegCommand) Reset() {
 	f.cuts = make([]ffmpegCut, 0)
 }
 
-func wrapWithSingleQuote(s string) string {
-	return fmt.Sprintf("'%s'", s)
+func replaceSpaceWithUnderscore(s string) string {
+	return strings.Replace(s, " ", "_", 0)
 }

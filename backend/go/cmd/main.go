@@ -34,7 +34,7 @@ func main() {
 	port := os.Getenv(ENV_PORT)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		logger.Fatalf("can not listen on address %s (maybe port is taken?)", lis.Addr())
+		logger.Fatalf("can not listen on address %s (maybe port is taken?)", port)
 	}
 	s := grpc.NewServer()
 	cs := clippersrvc.NewClipperService(logger, srcDir, clipDir)
