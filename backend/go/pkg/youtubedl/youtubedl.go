@@ -20,23 +20,29 @@ func NewYoutubeDlCommand(logger *log.Logger, url, outTempl string) *YoutubeDlCom
 }
 
 func (ydl YoutubeDlCommand) GetID() (string, error) {
-	cmd := exec.Command("youtube-dl", "--get-id", ydl.url)
-	stdout, err := cmd.StdoutPipe()
+	out, err := exec.Command("youtube-dl", "--get-id", ydl.url).Output()
 	if err != nil {
 		return "", err
 	}
 
-	var videoId []byte
-	_, err = stdout.Read(videoId)
-	if err != nil {
-		return "", err
-	}
-
-	return string(videoId), nil
+	return strings.TrimSpace(string(out)), nil
 }
 
 func (ydl YoutubeDlCommand) Execute() error {
 	cmd := exec.Command("youtube-dl", "-o", ydl.outTempl, "--download-archive", ARCHIVE, "-f", "best", ydl.url)
 	ydl.logger.Printf("executing %s", strings.Join(cmd.Args, " "))
 	return cmd.Run()
+}
+
+func (ydl *YoutubeDlCommand) SetOutTmpl(tmpl string) {
+	ydl.outTempl = tmpl
+}
+
+func (ydl *YoutubeDlCommand) SetUrl(url string) {
+	ydl.url = url
+}
+
+func (ydl *YoutubeDlCommand) Reset() {
+	ydl.url = ""
+	ydl.outTempl = ""
 }

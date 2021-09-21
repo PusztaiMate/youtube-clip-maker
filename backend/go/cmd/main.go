@@ -1,14 +1,15 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
-	"strings"
 
 	"github.com/PusztaiMate/clipper-go-backend/clips"
+	"github.com/PusztaiMate/clipper-go-backend/pkg/clippersrvc"
+	"github.com/PusztaiMate/clipper-go-backend/pkg/server"
+	"github.com/PusztaiMate/clipper-go-backend/pkg/utils"
 	"google.golang.org/grpc"
 )
 
@@ -18,24 +19,14 @@ const (
 	ENV_PORT      = "PORT"
 )
 
-type server struct {
-	clips.UnimplementedClipsServer
-
-	logger *log.Logger
-}
-
-func (s *server) NewClip(c context.Context, cr *clips.ClipsRequest) (*clips.ClipsResponse, error) {
-	s.logger.Printf("url in the incoming request: %s", cr.Url)
-	s.logger.Printf("received %d clips", len(cr.Clips))
-	for _, clip := range cr.Clips {
-		s.logger.Printf("received clip: %v", clip)
-	}
-	return &clips.ClipsResponse{Message: "success"}, nil
-}
-
 func main() {
 	logger := log.New(os.Stdout, "[CLIPPER SERVICE] ", log.LstdFlags)
-	err := checkEnvVars()
+	err := utils.CheckEnvVars(ENV_CLIPS_DIR, ENV_SRC_DIR, ENV_PORT)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	srcDir, clipDir, err := createDirs()
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -46,25 +37,21 @@ func main() {
 		logger.Fatalf("can not listen on address %s (maybe port is taken?)", lis.Addr())
 	}
 	s := grpc.NewServer()
-	clips.RegisterClipsServer(s, &server{logger: logger})
+	cs := clippersrvc.NewClipperService(logger, srcDir, clipDir)
+	clips.RegisterClipsServer(s, server.NewClipServer(logger, cs))
 	logger.Printf("starting server...")
 	if err := s.Serve(lis); err != nil {
 		logger.Fatalf("server stopped: %v", err)
 	}
 }
 
-func checkEnvVars() error {
-	var missing []string
-	envVars := []string{ENV_CLIPS_DIR, ENV_PORT, ENV_SRC_DIR}
+func createDirs() (string, string, error) {
+	srcDir, clipDir := os.Getenv(ENV_SRC_DIR), os.Getenv(ENV_CLIPS_DIR)
 
-	for _, v := range envVars {
-		if _, ok := os.LookupEnv(v); !ok {
-			missing = append(missing, v)
-		}
+	err := utils.MakeDirs(srcDir, clipDir)
+	if err != nil {
+		return "", "", err
 	}
 
-	if len(missing) != 0 {
-		return fmt.Errorf("missing environment variables: %s", strings.Join(missing, ", "))
-	}
-	return nil
+	return srcDir, clipDir, nil
 }

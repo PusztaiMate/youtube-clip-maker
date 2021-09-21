@@ -181,3 +181,4 @@ yarn-error.log
 *.pyc
 archive
 backend/go/archive.txt
+backend/go/cmd/archive.txt
