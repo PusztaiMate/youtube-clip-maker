@@ -4,6 +4,6 @@ Content-Type: application/json
 {
 	"url": "https://www.youtube.com/watch?v=UDAVj_vlAr8",
 	"clips": [
-		{"start": "00:01", "end":"01:03", "player":"Mate", "event":"nem"}
+		{"start_time": "00:01", "end_time":"01:03", "player":"Mate", "event":"nem"}
 	]
 }

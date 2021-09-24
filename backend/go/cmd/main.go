@@ -1,16 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/PusztaiMate/clipper-go-backend/clips"
 	"github.com/PusztaiMate/clipper-go-backend/pkg/clippersrvc"
-	"github.com/PusztaiMate/clipper-go-backend/pkg/server"
+	"github.com/PusztaiMate/clipper-go-backend/pkg/restserver"
 	"github.com/PusztaiMate/clipper-go-backend/pkg/utils"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -30,19 +28,17 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-
 	port := os.Getenv(ENV_PORT)
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
-	if err != nil {
-		logger.Fatalf("can not listen on address %s (maybe port is taken?)", port)
-	}
-	s := grpc.NewServer()
+
 	cs := clippersrvc.NewClipperService(logger, srcDir, clipDir)
-	clips.RegisterClipsServer(s, server.NewClipServer(logger, cs))
-	logger.Printf("starting server...")
-	if err := s.Serve(lis); err != nil {
-		logger.Fatalf("server stopped: %v", err)
-	}
+	restServer := restserver.NewClipperRESTServer(logger, cs, "0.0.0.0", port)
+	cancel := restServer.Run()
+	defer cancel()
+
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
+	<-signals
+	restServer.Shutdown()
 }
 
 func createDirs() (string, string, error) {
