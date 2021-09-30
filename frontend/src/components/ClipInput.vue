@@ -27,7 +27,7 @@
         <td>
           <input
             type="text"
-            v-model="c.start"
+            v-model="c.start_time"
             name="start"
             placeholder="00:00"
             class="input-text"
@@ -36,7 +36,7 @@
         <td>
           <input
             type="text"
-            v-model="c.end"
+            v-model="c.end_time"
             name="start"
             placeholder="02:12"
             class="input-text"
@@ -111,7 +111,7 @@ export default defineComponent({
   },
   data() {
     return {
-      clips: [{ start: "", end: "", player: "", event: "" }],
+      clips: [{ start_time: "", end_time: "", player: "", event: "" }],
       url: "",
       names: ["Csapat"],
       selectedName: "Csapat",
@@ -122,8 +122,8 @@ export default defineComponent({
   methods: {
     addNewRow() {
       this.clips.push({
-        start: "",
-        end: "",
+        start_time: "",
+        end_time: "",
         player: "",
         event: ""
       });
@@ -145,7 +145,7 @@ export default defineComponent({
       console.log(options.body);
 
       // jesus... FIXME: nginx maybe? or :8000/clip works?
-      fetch("http://pumate.hu:8000/clip/", options)
+      fetch("http://localhost:8000/clip", options)
         .then(resp => console.log(resp.json()))
         .then(() => (this.clips = []))
         .catch(err => console.log(err));

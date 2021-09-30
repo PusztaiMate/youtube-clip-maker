@@ -29,7 +29,7 @@ func (ydl YoutubeDlCommand) GetID() (string, error) {
 }
 
 func (ydl YoutubeDlCommand) Execute() error {
-	cmd := exec.Command("youtube-dl", "-o", ydl.outTempl, "--download-archive", ARCHIVE, "-f", "best", ydl.url)
+	cmd := exec.Command("youtube-dl", "-o", ydl.outTempl, "--download-archive", ARCHIVE, ydl.url)
 	ydl.logger.Printf("executing %s", strings.Join(cmd.Args, " "))
 	return cmd.Run()
 }

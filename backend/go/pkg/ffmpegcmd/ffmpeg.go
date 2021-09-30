@@ -45,15 +45,17 @@ func (f FfmpegCommand) Do() {
 		close(errChan)
 	}()
 
-	f.logger.Println("Waiting for clips to be cut out...")
 	for err := range errChan {
 		f.logger.Printf("%s", err)
 	}
-	f.logger.Println("Cutting done!")
 }
 
 func (f *FfmpegCommand) AddCut(startTime, endTime string) {
 	f.cuts = append(f.cuts, ffmpegCut{startTime, endTime})
+}
+
+func (f *FfmpegCommand) String() string {
+	return fmt.Sprintf("FfmpegCommand(src=%s, numOfCuts=%d)", f.sourceVideoPath, len(f.cuts))
 }
 
 func (f *FfmpegCommand) createOutputName(first, second string) string {
@@ -61,7 +63,7 @@ func (f *FfmpegCommand) createOutputName(first, second string) string {
 }
 
 func createSingleCmd(input, output, startTime, endTime string) *exec.Cmd {
-	return exec.Command("ffmpeg", "-ss", startTime, "-i", input, "-to", endTime, "-y", replaceSpaceWithUnderscore((output)))
+	return exec.Command("ffmpeg", "-i", input, "-ss", startTime, "-to", endTime, "-y", replaceSpaceWithUnderscore((output)))
 }
 
 func (f *FfmpegCommand) SetOutPrefix(prefix string) {

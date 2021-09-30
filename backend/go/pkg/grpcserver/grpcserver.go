@@ -21,7 +21,7 @@ func NewClipServer(logger *log.Logger, clipper *clippersrvc.ClipperService) *Cli
 }
 
 func (s *ClipServer) NewClip(c context.Context, cr *clips.ClipsRequest) (*clips.ClipsResponse, error) {
-	err := s.clipper.CreateClips(cr)
+	err := s.clipper.CreateClips(clips.ToClip(cr))
 	if err != nil {
 		return clips.NewClipResponse(fmt.Sprintf("error when processing clips: %s", err)), err
 	}

@@ -3,8 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/PusztaiMate/clipper-go-backend/pkg/clippersrvc"
 	"github.com/PusztaiMate/clipper-go-backend/pkg/restserver"
@@ -14,12 +12,13 @@ import (
 const (
 	ENV_CLIPS_DIR = "CLIPS_DIR"
 	ENV_SRC_DIR   = "SRC_DIR"
-	ENV_PORT      = "PORT"
+	ENV_REST_PORT = "REST_PORT"
+	ENV_GRPC_PORT = "GRPC_PORT"
 )
 
 func main() {
 	logger := log.New(os.Stdout, "[CLIPPER SERVICE] ", log.LstdFlags)
-	err := utils.CheckEnvVars(ENV_CLIPS_DIR, ENV_SRC_DIR, ENV_PORT)
+	err := utils.CheckEnvVars(ENV_CLIPS_DIR, ENV_SRC_DIR, ENV_REST_PORT, ENV_GRPC_PORT)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -28,17 +27,16 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	port := os.Getenv(ENV_PORT)
+	restPort := os.Getenv(ENV_REST_PORT)
 
 	cs := clippersrvc.NewClipperService(logger, srcDir, clipDir)
-	restServer := restserver.NewClipperRESTServer(logger, cs, "0.0.0.0", port)
-	cancel := restServer.Run()
-	defer cancel()
 
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
-	<-signals
-	restServer.Shutdown()
+	logger.Printf("starting rest server at port %s", restPort)
+	restServer := restserver.NewClipperRESTServer(logger, cs, "0.0.0.0", restPort)
+	err = restServer.Run()
+	if err != nil {
+		log.Fatalf("could not start server: %s", err)
+	}
 }
 
 func createDirs() (string, string, error) {
